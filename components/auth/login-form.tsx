@@ -31,13 +31,20 @@ export function LoginForm() {
     defaultValues: { email: "", password: "" },
   });
 
+  type LoginResponse = { error: string } | { success: string } | undefined;
+
   const onSubmit = (values: z.infer<typeof LoginSchema>) => {
     setError("");
     setSuccess("");
     startTransition(() => {
-      login(values).then((data) => {
-        setError(data.error);
-        setSuccess(data.success);
+      login(values).then((data: LoginResponse) => {
+        if (data) {
+          if ("error" in data) {
+            setError(data.error);
+          } else if ("success" in data) {
+            setSuccess(data.success);
+          }
+        }
       });
     });
   };
