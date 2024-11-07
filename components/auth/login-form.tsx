@@ -1,6 +1,5 @@
 "use client";
 import CardWrapper from "@/components/auth/card-wrapper";
-
 import * as z from "zod";
 import { LoginSchema } from "@/schemas";
 import { useForm } from "react-hook-form";
@@ -17,11 +16,16 @@ import { Input } from "@/components/ui/input";
 import { Button } from "../ui/button";
 import { FormError } from "../form-error";
 import { FormSuccess } from "../form-success";
-
 import { login } from "@/actions/login";
 import { useTransition, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 export function LoginForm() {
+  const searchParams = useSearchParams();
+  const urlError =
+    searchParams.get("error") === "OAuthAccountNotLinked"
+      ? "Email already in use with another provider!"
+      : "";
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
@@ -31,20 +35,13 @@ export function LoginForm() {
     defaultValues: { email: "", password: "" },
   });
 
-  type LoginResponse = { error: string } | { success: string } | undefined;
-
   const onSubmit = (values: z.infer<typeof LoginSchema>) => {
     setError("");
     setSuccess("");
     startTransition(() => {
-      login(values).then((data: LoginResponse) => {
-        if (data) {
-          if ("error" in data) {
-            setError(data.error);
-          } else if ("success" in data) {
-            setSuccess(data.success);
-          }
-        }
+      login(values).then((data) => {
+        setError(data?.error);
+        // setSuccess(data.success);
       });
     });
   };
@@ -96,7 +93,7 @@ export function LoginForm() {
               )}
             />
           </div>
-          <FormError message={error} />
+          <FormError message={error || urlError} />
           <FormSuccess message={success} />
           <Button disabled={isPending} type="submit" className="w-full">
             Login
