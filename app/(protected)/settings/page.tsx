@@ -127,7 +127,7 @@ export default function SettingPage() {
                             placeholder="******"
                             type="password"
                             disabled={isPending}
-                            autoComplete="off"
+                            autoComplete="new-password"
                           />
                         </FormControl>
                         <FormMessage />

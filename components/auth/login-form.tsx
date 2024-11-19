@@ -22,23 +22,21 @@ import { useTransition, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 export function LoginForm() {
-  const [showTwoFactor, setShowTwoFactor] = useState(false);
   const searchParams = useSearchParams();
   const urlError =
     searchParams.get("error") === "OAuthAccountNotLinked"
-      ? "Account already linked to another provider"
+      ? "Email already in use with another provider!"
       : "";
-  const [error, setError] = useState<string | undefined>(urlError);
-  const [success, setSuccess] = useState<string | undefined>("");
   const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | undefined>("");
+  const [success, setSuccess] = useState<string | undefined>("");
+  const [showTwoFactor, setShowTwoFactor] = useState(false);
+
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-      code: "",
-    },
+    defaultValues: { email: "", password: "", code: "" },
   });
+
   const onSubmit = async (values: z.infer<typeof LoginSchema>) => {
     setError("");
     setSuccess("");
@@ -59,10 +57,10 @@ export function LoginForm() {
 
   return (
     <CardWrapper
-      headerLabel="Welcome back"
+      headerLabel="Welcome back!"
       backButtonLabel="Don't have an account?"
       backButtonHref="/auth/register"
-      showSocial={true}
+      showSocial
     >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -73,11 +71,11 @@ export function LoginForm() {
                 name="code"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Two factor code</FormLabel>
+                    <FormLabel>Two Factor Code</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
-                        placeholder="Two factor code"
+                        placeholder="123456"
                         disabled={isPending}
                       />
                     </FormControl>
@@ -97,7 +95,8 @@ export function LoginForm() {
                       <FormControl>
                         <Input
                           {...field}
-                          placeholder="Email"
+                          // type="email"
+                          placeholder="example@email.com"
                           disabled={isPending}
                         />
                       </FormControl>
@@ -115,18 +114,19 @@ export function LoginForm() {
                         <Input
                           {...field}
                           type="password"
-                          placeholder="Password"
+                          placeholder="******"
                           disabled={isPending}
                         />
                       </FormControl>
                       <Button
-                        variant="link"
-                        className="p-0 font-normal"
+                        variant={"link"}
+                        className="px-0  font-normal"
                         size="sm"
                         asChild
                       >
                         <Link href="/auth/reset">Forgot password?</Link>
                       </Button>
+
                       <FormMessage />
                     </FormItem>
                   )}
@@ -134,10 +134,10 @@ export function LoginForm() {
               </>
             )}
           </div>
-          {success && <FormSuccess message={success} />}
-          {(error || urlError) && <FormError message={error || urlError} />}
-          <Button type="submit" className="w-full" disabled={isPending}>
-            {showTwoFactor ? "Verify" : "Login"}
+          <FormError message={error || urlError} />
+          <FormSuccess message={success} />
+          <Button disabled={isPending} type="submit" className="w-full">
+            {showTwoFactor ? "Confirm" : "Login"}
           </Button>
         </form>
       </Form>
