@@ -13,7 +13,7 @@ import { getTwoFactorTokenByEmail } from "@/data/two-factor-token";
 import { getTwoFactorConfirmationByUserId } from "@/data/two-factor-confirmation";
 import { db } from "@/lib/db";
 
-export const login = async (values: z.infer<typeof LoginSchema>) => {
+export const login = async (values: z.infer<typeof LoginSchema>,callbackUrl?:string|null) => {
   //backend check login request
   const validatedFields = LoginSchema.safeParse(values);
 
@@ -76,25 +76,17 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
   }
 
   try {
-    const signInResponse = await signIn("credentials", {
+    await signIn("credentials", {
       email,
       password,
-      redirect: false,
+      redirectTo: callbackUrl ||default_login_redirect,
     });
 
-    if (signInResponse?.error) {
-      return { error: "Invalid credentials" };
-    }
-
-    return {
-      success: "Logged in successfully!",
-      redirectTo: default_login_redirect,
-    };
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {
         case "CredentialsSignin":
-          return { error: "Invalid credentials" };
+          return { error: "Invalid email or password" };
         default:
           return { error: "Something went wrong" };
       }

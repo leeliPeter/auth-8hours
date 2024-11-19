@@ -23,6 +23,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 
 export function LoginForm() {
   const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl");
   const urlError =
     searchParams.get("error") === "OAuthAccountNotLinked"
       ? "Email already in use with another provider!"
@@ -41,23 +42,19 @@ export function LoginForm() {
   const onSubmit = async (values: z.infer<typeof LoginSchema>) => {
     setError("");
     setSuccess("");
-
-    const response = await login(values);
-
-    if (response?.error) {
-      setError(response.error);
-    }
-
-    if (response?.success) {
-      setSuccess(response.success);
-      if (response.redirectTo) {
-        router.push(response.redirectTo);
-      }
-    }
-
-    if (response?.twoFactor) {
-      setShowTwoFactor(true);
-    }
+    startTransition(() => {
+      login(values, callbackUrl).then((data) => {
+        if (data?.error) {
+          setError(data.error);
+        }
+        if (data?.success) {
+          setSuccess(data.success);
+        }
+        if (data?.twoFactor) {
+          setShowTwoFactor(true);
+        }
+      });
+    });
   };
 
   return (
