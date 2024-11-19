@@ -71,7 +71,7 @@ export const login = async (values: z.infer<typeof LoginSchema>,callbackUrl?:str
     } else {
       const twoFactorToken = await generateTwoFactorToken(existingUser.email);
       await sendTwoFactorTokenEmail(twoFactorToken.email, twoFactorToken.token);
-      return { twoFactor: true };
+      return { twoFactor: true, success: "Two factor code sent!" };
     }
   }
 
