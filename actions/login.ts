@@ -69,6 +69,8 @@ export const login = async (values: z.infer<typeof LoginSchema>,callbackUrl?:str
         },
       });
     } else {
+      // if password or email is incorrect, return error
+      // if password and email is correct, send two factor code
       const twoFactorToken = await generateTwoFactorToken(existingUser.email);
       await sendTwoFactorTokenEmail(twoFactorToken.email, twoFactorToken.token);
       return { twoFactor: true, success: "Two factor code sent!" };
