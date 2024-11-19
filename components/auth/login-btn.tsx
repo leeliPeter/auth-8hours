@@ -16,11 +16,7 @@ interface LoginBtnProps {
   asChild?: boolean;
 }
 
-export const LoginButton = ({
-  children,
-  mode = "redirect",
-  asChild = false,
-}: LoginBtnProps) => {
+export const LoginButton = ({ children, mode = "redirect" }: LoginBtnProps) => {
   const router = useRouter();
 
   const onClick = () => {

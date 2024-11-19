@@ -1,11 +1,17 @@
 import { PrismaClient } from '@prisma/client'
 
-declare global{
-    var prisma: PrismaClient | undefined;
+// Extend the global type without using namespace
+declare global {
+    interface Global {
+        prisma: PrismaClient | undefined
+    }
 }
 
-export const db = globalThis.prisma || new PrismaClient();
+// Create a typed reference to the global object
+const globalForPrisma = global as { prisma?: PrismaClient }
 
-if(process.env.NODE_ENV !== 'production') {
-  globalThis.prisma = db;
+export const db = globalForPrisma.prisma || new PrismaClient()
+
+if (process.env.NODE_ENV !== 'production') {
+    globalForPrisma.prisma = db
 }

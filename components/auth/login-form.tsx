@@ -19,7 +19,7 @@ import { FormError } from "../form-error";
 import { FormSuccess } from "../form-success";
 import { login } from "@/actions/login";
 import { useTransition, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 export function LoginForm() {
   const searchParams = useSearchParams();
@@ -32,7 +32,6 @@ export function LoginForm() {
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
   const [showTwoFactor, setShowTwoFactor] = useState(false);
-  const router = useRouter();
 
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
