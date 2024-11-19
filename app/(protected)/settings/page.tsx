@@ -184,9 +184,10 @@ export default function SettingPage() {
                   control={form.control}
                   name="isTwoFactorEnabled"
                   render={({ field }) => (
-                    <FormItem className="flex flex-row items-center j
-                    ustify-between 
-                    rounded-lg border p-3 shadow-sm">
+                    <FormItem
+                      className="flex flex-row items-center justify-between 
+                    rounded-lg border p-3 shadow-sm"
+                    >
                       <div className="space-y-0.5">
                         <FormLabel>Two Factor Authetication</FormLabel>
                         <FormDescription>
