@@ -1,7 +1,6 @@
 "use server";
-
-import { LoginSchema } from "@/schemas";
 import * as z from "zod";
+import { LoginSchema } from "@/schemas";
 import { signIn } from "@/auth";
 import { default_login_redirect } from "@/routes";
 import { AuthError } from "next-auth";
@@ -10,17 +9,16 @@ import { getUserByEmail } from "@/data/user";
 import { sendVerificationEmail } from "@/lib/mail";
 import { generateTwoFactorToken } from "@/lib/tokens";
 import { sendTwoFactorTokenEmail } from "@/lib/mail";
-import { db } from "@/lib/db";
 import { getTwoFactorTokenByEmail } from "@/data/two-factor-token";
 import { getTwoFactorConfirmationByUserId } from "@/data/two-factor-confirmation";
+import { db } from "@/lib/db";
 
-export const login = async (values: z.infer<typeof LoginSchema>) => {
+export const login = async (values: z.infer<typeof LoginSchema>,callbackUrl?:string|null) => {
+  //backend check login request
   const validatedFields = LoginSchema.safeParse(values);
 
   if (!validatedFields.success) {
-    return {
-      error: "Invalid fields",
-    };
+    return { error: "Invalid fields" };
   }
   const { email, password, code } = validatedFields.data;
 
@@ -71,8 +69,6 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
         },
       });
     } else {
-      // if password or email is incorrect, return error
-      // if password and email is correct, send two factor code
       const twoFactorToken = await generateTwoFactorToken(existingUser.email);
       await sendTwoFactorTokenEmail(twoFactorToken.email, twoFactorToken.token);
       return { twoFactor: true, success: "Two factor code sent!" };
@@ -83,7 +79,7 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
     await signIn("credentials", {
       email,
       password,
-      redirectTo: default_login_redirect,
+      redirectTo: callbackUrl ||default_login_redirect,
     });
 
   } catch (error) {

@@ -33,14 +33,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
       //todo:add 2FA check
       if (existingUser?.isTwoFactorEnabled) {
-        const twoFactorConfirmation = await getTwoFactorConfirmationByUserId(
-          existingUser.id
-        );
-        if (!twoFactorConfirmation) return false;
+        const twoFactorTokenConfirmation = await getTwoFactorConfirmationByUserId(existingUser.id);
+        if (!twoFactorTokenConfirmation) return false;
 
-        //delete confirmation for next login
+        // delete confirmation for next sign in
         await db.twoFactorConfirmation.delete({
-          where: { id: twoFactorConfirmation.id },
+          where: { id: twoFactorTokenConfirmation.id },
         });
       }
       return true;
